@@ -249,7 +249,7 @@ class ConjugateResidual(Solvers):
         self.stat["xk"] = self.xk.tolist()
         self.xk = self.xk - torch.dot(self.xk, rk) * rk / (norm_r ** 2)
         self.stat["xk_lifted"] = self.xk.tolist()
-            
+
 class MinimalResidual(Solvers):
     
     #_STATS = ("ite", "|rk|/|b|", "|Ark|/|Ab|", "<b, Ar>", "<Ad0, Adk>", "<v1, vk>", "A(αp)-(αA)p", "|b-Ax-r|")

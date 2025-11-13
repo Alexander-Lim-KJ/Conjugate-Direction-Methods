@@ -19,7 +19,7 @@ def CG(A, b, rtol = 1e-2, maxit = 100):
     pAp = torch.dot(pk, Apk)
     norm_rk = torch.norm(rk)
     norm_pksq = torch.norm(pk) ** 2
-     
+         
     while norm_rk / norm_b > rtol and pAp > cZERO and torch.norm(Apk) / norm_Ab > cZERO and k < maxit:
         
         alpha = norm_rk ** 2 / pAp

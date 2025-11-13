@@ -51,6 +51,10 @@ if "MR" in ALGO:
     MR = MinimalResidual(H, b, maxit = TERMINATE, tol = TOL, reO = REO, prinT = VERBOSE)
     MR.solve()
 
+if "CGCR" in ALGO:
+    print("\n", 40 * "=", " Conjugate ResGrad ", 40 * "=", "\n")
+    MR = MinimalResidual(H, b, maxit = TERMINATE, tol = TOL, reO = REO, prinT = VERBOSE)
+    MR.solve()
 # plt.semilogy(range(0, MR.ite + 1), torch.norm(MR._X - CR._X, float("inf"), dim = 0), 
 #              label = "$||\mathbf{x}_k^{MINRES} - \mathbf{x}_k^{CR}||_{\infty}$")
 # plt.title(f"(Indefinite Matrix) Grades : {RANGE}")
@@ -59,4 +63,4 @@ if "MR" in ALGO:
 # plt.legend()
 # plt.show()
 
-draw.plotGraphs(CG, CR, MR, "./comparisons")
+#draw.plotGraphs(CG, CR, MR, "./comparisons")

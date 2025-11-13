@@ -9,7 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import utils, torch
 
-FOLDER_PATH = "./gaussian_results_5/gaussMR"#"./kernelResults_nolowrank"
+FOLDER_PATH = "./pde2"#"./kernelResults_nolowrank"
 SPLIT = ".json"
 
 
@@ -47,7 +47,7 @@ def plotGraphs(CG, CR, MR, folder_path = None):
     matplotlib.rc('font', **FONT)
     # CG
     if not CG is None:
-        CG = CG.stat 
+        #CG = CG.stat 
         print("CG:", CG.keys())
         ite = len(CG['|rk|/|b|'])
 
@@ -73,7 +73,7 @@ def plotGraphs(CG, CR, MR, folder_path = None):
 
     # CR
     if not CR is None:
-        CR = CR.stat
+        #CR = CR.stat
         print("CR:", CR.keys())
         ite = len(CR['|rk|/|b|'])
         
@@ -98,7 +98,7 @@ def plotGraphs(CG, CR, MR, folder_path = None):
 
     # MR.
     if not MR is None:
-        MR = MR.stat
+        #MR = MR.stat
         print("MR:", MR.keys())
         ite = len(MR['|rk|/|b|'])
         
@@ -129,6 +129,6 @@ def drawGaussTiger(folder_path):
     plt.imshow(img)
 
 if __name__ == "__main__":
-    drawGaussTiger(FOLDER_PATH)
-    #records = utils.openAllRecords(FOLDER_PATH)
-    #plotGraphs(records["CG"], records["CR"], records["MR"], FOLDER_PATH)
+    #drawGaussTiger(FOLDER_PATH)
+    records = utils.openAllRecords(FOLDER_PATH)
+    plotGraphs(records["CG"], records["CR"], records["MR"], FOLDER_PATH)

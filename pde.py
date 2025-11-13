@@ -12,12 +12,12 @@ from solvers import ConjugateGradient, ConjugateResidual, MinimalResidual
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-FOLDER = "./pde"
+FOLDER = "./pde2"
 TOL = 1e-10
-MAXIT = 2000
-SOLVER = "CR"
-RESOL = 128
-CENTER = (0.01, 0.01)
+MAXIT = 300
+SOLVER = " "
+RESOL = 32#128
+CENTER = (0.001, 0.001)
 WIDTH = 20
 
 class MeshGrid:
@@ -370,8 +370,22 @@ if "__main__" == __name__:
     h, f, g = x2y2()
     laplace = Laplace(CENTER, WIDTH, RESOL, f, g)
     L = laplace.laplaceSparse()
-    L = toTorchSparse(L).to(cCUDA)
     b = laplace.b().to(cCUDA)
+
+    import scipy, numpy
+    import matplotlib.pyplot as plt
+    eigvals, eigvecs = scipy.sparse.linalg.eigsh(L, k = 1088, which = "LM")
+    smeval, smevec = scipy.sparse.linalg.eigsh(L, k = 10, which = "SM")
+    eigvecs = numpy.concatenate([smevec[:,0].reshape(-1, 1), eigvecs], axis = 1)
+    eigvals = numpy.append([1e-7], eigvals)
+    sort_b = numpy.abs(eigvecs.T @ b.numpy())
+    plt.semilogy(eigvals, label = "eigvals")
+    plt.scatter(range(1089), sort_b, label = "b")
+    plt.scatter(range(1089), sort_b / eigvals, label = "b / eigvals")
+    plt.legend()
+    plt.show()
+    
+    L = toTorchSparse(L).to(cCUDA)
     
     if "CG" in SOLVER:
         CG = ConjugateGradient(L, b, maxit = MAXIT, tol = TOL)
@@ -397,33 +411,33 @@ if "__main__" == __name__:
     xk = xk.cpu()
     xk_true = h(*laplace.allXY()).reshape(RESOL + 1, RESOL + 1).cpu()
     
-    xk = xk.reshape(-1)
-    xk_true = xk_true.reshape(-1).double()
+    #xk = xk.reshape(-1)
+    #xk_true = xk_true.reshape(-1).double()
     
-    diff = b - torch.mv(L, xk)
-    diff_true = b - torch.mv(L, xk_true)
+    #diff = b - torch.mv(L, xk)
+    #diff_true = b - torch.mv(L, xk_true)
     
-    print("relative error:", torch.norm(diff) / torch.norm(b))
-    print("true relative error:", torch.norm(diff_true) / torch.norm(b))
-    # x = plt.contour(X, Y, xk, 10)
-    # plt.clabel(x, inline=True, fontsize = 10)
-    # plt.savefig(f"./{FOLDER}/{SOLVER}_contour.png")
-    # plt.close()
+    #print("relative error:", torch.norm(diff) / torch.norm(b))
+    #print("true relative error:", torch.norm(diff_true) / torch.norm(b))
+    x = plt.contour(X, Y, xk, 10)
+    plt.clabel(x, inline=True, fontsize = 10)
+    plt.savefig(f"./{FOLDER}/{SOLVER}_contour.png")
+    plt.close()
     
-    # fig, ax = plt.subplots(nrows = 1, ncols = 1, subplot_kw={"projection": "3d"})
-    # ax.plot_surface(X, Y, xk, cmap = cm.coolwarm)
-    # plt.savefig(f"./{FOLDER}/{SOLVER}_3d.png")
-    # plt.close()
+    fig, ax = plt.subplots(nrows = 1, ncols = 1, subplot_kw={"projection": "3d"})
+    ax.plot_surface(X, Y, xk, cmap = cm.coolwarm)
+    plt.savefig(f"./{FOLDER}/{SOLVER}_3d.png")
+    plt.close()
     
-    # x = plt.contour(X, Y, xk_true, 10)
-    # plt.clabel(x, inline=True, fontsize = 10)
-    # plt.savefig(f"./{FOLDER}/original_contour.png")
-    # plt.close()
+    x = plt.contour(X, Y, xk_true, 10)
+    plt.clabel(x, inline=True, fontsize = 10)
+    plt.savefig(f"./{FOLDER}/original_contour.png")
+    plt.close()
     
-    # fig, ax = plt.subplots(nrows = 1, ncols = 1, subplot_kw={"projection": "3d"})
-    # ax.plot_surface(X, Y, xk, cmap = cm.coolwarm)
-    # plt.savefig(f"./{FOLDER}/original_3d.png")
-    # plt.close()
+    fig, ax = plt.subplots(nrows = 1, ncols = 1, subplot_kw={"projection": "3d"})
+    ax.plot_surface(X, Y, xk, cmap = cm.coolwarm)
+    plt.savefig(f"./{FOLDER}/original_3d.png")
+    plt.close()
     
     
     
